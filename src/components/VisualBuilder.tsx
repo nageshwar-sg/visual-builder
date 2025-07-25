@@ -81,8 +81,17 @@ const DraggableBlock: React.FC<{
   );
 };
 
-const VisualBuilder: React.FC = () => {
-  const [blocks, setBlocks] = useState<Block[]>([]);
+interface VisualBuilderProps {
+  blocks: Block[];
+  setBlocks: React.Dispatch<React.SetStateAction<Block[]>>;
+  editing?: boolean;
+}
+
+const VisualBuilder: React.FC<VisualBuilderProps> = ({
+  blocks,
+  setBlocks,
+  editing = true,
+}) => {
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [entryUid, setEntryUid] = useState<string | null>(null);
@@ -91,6 +100,7 @@ const VisualBuilder: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!editing) return;
     async function loadBlocks() {
       setLoading(true);
       try {
@@ -110,7 +120,7 @@ const VisualBuilder: React.FC = () => {
       }
     }
     loadBlocks();
-  }, []);
+  }, [setBlocks, editing]);
 
   const addTextBlock = () => {
     setBlocks([
