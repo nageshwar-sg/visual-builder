@@ -9,9 +9,10 @@ import {
   Divider,
 } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
-import VisualBuilder from "./components/VisualBuilder";
 import Preview from "./components/Preview";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { deliveryStack, language } from "./utils/contentstack";
+import VisualBuilder from "./components/VisualBuilder";
 
 const theme = createTheme();
 
@@ -30,6 +31,53 @@ const About: React.FC = () => (
   </Box>
 );
 
+const PreviewPage: React.FC = () => {
+  const [blocks, setBlocks] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    async function fetchPublished() {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await deliveryStack
+          .ContentType("page")
+          .Query()
+          .language(language)
+          .toJSON()
+          .find();
+        const entries = result[0] || [];
+        if (entries.length > 0) {
+          setBlocks(entries[0].blocks || []);
+        } else {
+          setBlocks([]);
+        }
+      } catch (e) {
+        setError("Failed to fetch published content");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPublished();
+  }, []);
+
+  return (
+    <Box>
+      <Typography variant="h4" gutterBottom>
+        Public Preview
+      </Typography>
+      {loading ? (
+        <Typography>Loading...</Typography>
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : (
+        <Preview blocks={blocks} />
+      )}
+    </Box>
+  );
+};
+
 const App: React.FC = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
 
@@ -44,6 +92,9 @@ const App: React.FC = () => {
             </MuiLink>
             <MuiLink component={Link} to="/about" underline="hover">
               About
+            </MuiLink>
+            <MuiLink component={Link} to="/preview" underline="hover">
+              Preview
             </MuiLink>
           </Box>
           <Routes>
@@ -74,6 +125,7 @@ const App: React.FC = () => {
               }
             />
             <Route path="/about" element={<About />} />
+            <Route path="/preview" element={<PreviewPage />} />
           </Routes>
         </Container>
       </BrowserRouter>

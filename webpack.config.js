@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
 const webpack = require("webpack");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -33,6 +34,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv(),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),
@@ -49,11 +51,20 @@ module.exports = {
       },
     }),
     new webpack.DefinePlugin({
-      "process.env.REACT_APP_CONTENTSTACK_API_KEY": JSON.stringify(
-        process.env.REACT_APP_CONTENTSTACK_API_KEY
+      "process.env.REACT_APP_CONTENT_STACK_API_KEY": JSON.stringify(
+        process.env.REACT_APP_CONTENT_STACK_API_KEY
       ),
-      "process.env.REACT_APP_CONTENTSTACK_MANAGEMENT_TOKEN": JSON.stringify(
-        process.env.REACT_APP_CONTENTSTACK_MANAGEMENT_TOKEN
+      "process.env.REACT_APP_CONTENT_STACK_MANAGEMENT_TOKEN": JSON.stringify(
+        process.env.REACT_APP_CONTENT_STACK_MANAGEMENT_TOKEN
+      ),
+      "process.env.CONTENT_STACK_ENVIRONMENT": JSON.stringify(
+        process.env.CONTENT_STACK_ENVIRONMENT
+      ),
+      "process.env.CONTENT_STACK_REGION": JSON.stringify(
+        process.env.CONTENT_STACK_REGION
+      ),
+      "process.env.CONTENT_STACK_LANGUAGE": JSON.stringify(
+        process.env.CONTENT_STACK_LANGUAGE
       ),
     }),
   ],
